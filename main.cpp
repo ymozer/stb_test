@@ -1,5 +1,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <iostream>
+#include <vector>
+#include <algorithm>
 #include "stb_image_write.h"
 
 // function to draw a line using Bresenham's algorithm
@@ -11,7 +13,9 @@ void drawLine(int x1, int y1, int x2, int y2, int width, int height, unsigned ch
     int err = dx - dy;
 
     while (true) {
-        int index = (y1 * width + x1) * 3; // 3 bytes per pixel
+        //int index = (y1 * width + x1) * 3; // 3 bytes per pixel
+        int index = ((height - 1 - y1) * width + x1) * 3; // 3 bytes per pixel
+
         data[index] = 255; // red channel
         data[index + 1] = 255; // green channel
         data[index + 2] = 255; // blue channel
@@ -31,6 +35,48 @@ void drawLine(int x1, int y1, int x2, int y2, int width, int height, unsigned ch
     }
 }
 
+void fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3, int width, int height, unsigned char* data) {
+    // sort the vertices by y-coordinate ascending so v1 is the top-most vertice
+    if (y1 > y2) {
+		std::swap(y1, y2);
+		std::swap(x1, x2);
+	}
+    if (y2 > y3) {
+		std::swap(y2, y3);
+		std::swap(x2, x3);
+	}
+    if (y1 > y2) {
+		std::swap(y1, y2);
+		std::swap(x1, x2);
+	}
+
+	// compute the slopes
+	float m12 = (float)(x2 - x1) / (float)(y2 - y1);
+	float m23 = (float)(x3 - x2) / (float)(y3 - y2);
+	float m13 = (float)(x3 - x1) / (float)(y3 - y1);
+
+	// draw the first half of the triangle
+    for (int y = y1; y <= y2; ++y) {
+		int xStart = x1 + (y - y1) * m12;
+		int xEnd = x1 + (y - y1) * m13;
+		drawLine(xStart, y, xEnd, y, width, height, data);
+	}
+
+	// draw the second half of the triangle
+    for (int y = y2; y <= y3; ++y) {
+		int xStart = x1 + (y - y1) * m13;
+		int xEnd = x2 + (y - y2) * m23;
+		drawLine(xStart, y, xEnd, y, width, height, data);
+	}
+    
+}
+
+
+
+
+
+
+
 int main() {
     const int width = 512;
     const int height = 512;
@@ -38,13 +84,15 @@ int main() {
     for (int i = 0; i < width * height * 3; ++i) {
         data[i] = 0;
     }
-    // draw a line from (100,100) to (400,400)
-    drawLine(100, 100, 400, 400, width, height, data);
+
+    drawLine(50, 10, 500, 400, width, height, data);
+
+    fillTriangle(400, 234,30,30,259,450,width,height, data);
 
     // write the pixel data to a TGA file
-    stbi_write_tga("line.tga", width, height, 3, data);
+    stbi_write_tga("triangle.tga", width, height, 3, data);
+    std::cout << "Line saved to triangle.tga" << std::endl;
 
-    std::cout << "Line saved to line.tga" << std::endl;
     delete[] data;
     return 0;
 }
