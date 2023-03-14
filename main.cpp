@@ -2,7 +2,15 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include "stb_image_write.h"
+
+#include <stb_image_write.h>
+#include <assimp/pbrmaterial.h>
+#include <assimp/postprocess.h>
+
+#include <glm/gtx/string_cast.hpp> // to_string()
+#include <glm/glm.hpp>
+#include <glm/ext.hpp> // perspective, translate, rotate
+
 
 // function to draw a line using Bresenham's algorithm
 void drawLine(int x1, int y1, int x2, int y2, int width, int height, unsigned char* data) {
@@ -71,11 +79,15 @@ void fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3, int width, int
     
 }
 
-
-
-
-
-
+glm::mat4 transform(glm::vec2 const& Orientation, glm::vec3 const& Translate, glm::vec3 const& Up)
+{
+    glm::mat4 Proj = glm::perspective(glm::radians(45.f), 1.33f, 0.1f, 10.f);
+    glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.f), Translate);
+    glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Orientation.y, Up);
+    glm::mat4 View = glm::rotate(ViewRotateX, Orientation.x, Up);
+    glm::mat4 Model = glm::mat4(1.0f);
+    return Proj * View * Model;
+}
 
 int main() {
     const int width = 512;
@@ -92,7 +104,10 @@ int main() {
     // write the pixel data to a TGA file
     stbi_write_tga("triangle.tga", width, height, 3, data);
     std::cout << "Line saved to triangle.tga" << std::endl;
+    std::cout <<  "_________" << std::endl;
 
+    glm::mat4 transform_mat=transform(glm::vec2(1,2),glm::vec3(12,12,-79),glm::vec3(99,45,0) );
+    std::cout << glm::to_string(transform_mat) << std::endl;
     delete[] data;
     return 0;
 }
