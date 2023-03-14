@@ -97,7 +97,7 @@ int main() {
     fillTriangle(vertices[0], vertices[1], vertices[2], img_size, data);
     stbi_flip_vertically_on_write(true);
     stbi_write_tga("triangle.tga", width, height, 3, data);
-    std::cout << "Line saved to triangle.tga" << std::endl;
+ 
 
     delete[] data;
     return 0;
