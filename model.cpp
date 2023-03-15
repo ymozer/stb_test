@@ -126,6 +126,11 @@ bool ModelManager::processData()
     return true;
 }
 
+std::vector<float>* ModelManager::getFaceData()
+{
+	return &faceBuff;
+}
+
 std::vector<float>* ModelManager::getVertexData()
 {
     return &vertexBuff;

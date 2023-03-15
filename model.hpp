@@ -17,6 +17,7 @@ public:
 
 	bool loadModel(std::string file);
 	bool processData();
+	std::vector<float>* getFaceData();
 	std::vector<float>* getVertexData();
 	std::vector<uint16_t>* getIndexData();
 
@@ -28,6 +29,7 @@ private:
 	const aiNode* modelNode;
 	const aiMesh* modelMesh;
 	const aiFace* modelFace;
+	std::vector<float>			faceBuff;
 	std::vector<float>          vertexBuff;
 	std::vector<uint16_t>       indexBuff;
 
